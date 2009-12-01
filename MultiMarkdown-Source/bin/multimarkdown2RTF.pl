@@ -67,10 +67,10 @@ $temp_file = readpipe("mktemp -t multimarkdownXXXXX");
 if ($os =~ /MSWin/) {
 	# Of course, there is no textutil, so this doesn't really
 	# make any sense under Windows - just output the XHTML
-	$xslt = "| xsltproc -nonet -novalid ..\\XSLT\\$xslt_file -" if ($xslt_file ne "");
+	$xslt = "| xsltproc -nonet -novalid ..\\lib\\MultiMarkdown\\XSLT\\$xslt_file -" if ($xslt_file ne "");
 	open (MultiMarkdown, "| cd \"$me\"& perl .\\MultiMarkdown.pl | perl .\\$SmartyPants $xslt > \"$temp_file\"");
 } else {
-	$xslt = "| xsltproc -nonet -novalid ../XSLT/$xslt_file -" if ($xslt_file ne "");
+	$xslt = "| xsltproc -nonet -novalid ../lib/MultiMarkdown/XSLT/$xslt_file -" if ($xslt_file ne "");
 	open (MultiMarkdown, "| cd \"$me\"; ./MultiMarkdown.pl | ./$SmartyPants $xslt > \"$temp_file\"; textutil -convert rtf -stdout \"$temp_file\"");
 }
 

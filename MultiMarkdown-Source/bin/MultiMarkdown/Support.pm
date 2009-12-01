@@ -21,7 +21,18 @@ use Cwd;
 use Cwd 'abs_path';
 
 
-use vars qw(%g_metadata);
+use vars qw(%g_metadata $g_topdir $g_xsltdir $g_utilsdir $g_mathmldir);
+
+$g_topdir = dirname($0);
+if ($os =~ /MSWin/) {
+  $g_xsltdir = $g_topdir . "\\..\\lib\\MultiMarkdown\\XSLT\\";
+  $g_utilsdir = $g_topdir . "\\..\\lib\\MultiMarkdown\\Utilities\\";
+  $g_mathmldir = $g_topdir . "\\..\\lib\\MultiMarkdown\\MultiMarkdownXSLTMathML\\";
+} else {
+  $g_xsltdir = $g_topdir . "/../lib/MultiMarkdown/XSLT/";
+  $g_utilsdir = $g_topdir . "/../lib/MultiMarkdown/Utilities/";
+  $g_mathmldir = $g_topdir . "/../lib/MultiMarkdown/MultiMarkdownXSLTMathML/";
+}
 
 our $VERSION = '1.0';
 
@@ -48,11 +59,11 @@ sub ProcessMMD2XHTML {
 	}
 	
 	if ($os =~ /MSWin/) {
-		$xslt = "| xsltproc -nonet -novalid XSLT\\$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdirXSLT\\$xslt_file -" if ($xslt_file ne "");
 		$MMDPath =~ s/\//\\/g;
 		open (MultiMarkdown, "| cd $MMDPath & perl bin\\MultiMarkdown.pl | perl bin\\$SmartyPants $xslt $out");
 	} else {
-		$xslt = "| xsltproc -nonet -novalid XSLT/$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir/$xslt_file -" if ($xslt_file ne "");
 		open (MultiMarkdown, "| cd \"$MMDPath\"; bin/MultiMarkdown.pl | bin/$SmartyPants $xslt $out");
 	}
 	
@@ -84,7 +95,7 @@ sub ProcessMMD2RTF {
 	}
 	
 	if ($os =~ /MSWin/) {
-		$xslt = "| xsltproc -nonet -novalid XSLT\\$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir\\$xslt_file -" if ($xslt_file ne "");
 		$MMDPath =~ s/\//\\/g;
 		# TOD: This version won't crash on windows, but the regexp's aren't
 		# quite right.  I welcome input from Windows users but I'm tired of
@@ -92,7 +103,7 @@ sub ProcessMMD2RTF {
 		my $command = "| cd \"$MMDPath\" & perl -pi -e \"s/(?<![ \\\\])\\n/\\n/g\" | perl bin\\MultiMarkdown.pl | perl bin\\$SmartyPants $xslt | perl -pi -e \"s/(?<![ \\.])(?<!\\\\[fsi]\\d)(?<!\\\\fs\\d\\d)  +/ /g\" | perl -pi -e \"s/\\.   +/.  /g\"  | perl -pi -e \"s/^ +//mg\" $out";
 		open (MultiMarkdown, $command);
 	} else {
-		$xslt = "| xsltproc -nonet -novalid XSLT/$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir/$xslt_file -" if ($xslt_file ne "");
 		open (MultiMarkdown, "| cd \"$MMDPath\"; perl -pi -e 's/(?<![ #\\\\])\n/ \n/g' | bin/MultiMarkdown.pl | bin/$SmartyPants $xslt | perl -pi -e 's/(?<![ \.])(?<!\\\\[fsi]\\d)(?<!\\\\fs\\d\\d)  +/ /g' | perl -pi -e 's/\.   +/.  /g'  | perl -pi -e 's/^ +//mg' $out");
 	}
 	
@@ -124,12 +135,12 @@ sub ProcessMMD2LaTeX {
 	}
 	
 	if ($os =~ /MSWin/) {
-		$xslt = "| xsltproc -nonet -novalid XSLT\\$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir\\$xslt_file -" if ($xslt_file ne "");
 		$MMDPath =~ s/\//\\/g;
-		open (MultiMarkdown, "| cd \"$MMDPath\" & perl bin\\MultiMarkdown.pl | perl bin\\$SmartyPants $xslt | perl Utilities\\cleancites.pl $out");
+		open (MultiMarkdown, "| cd \"$MMDPath\" & perl bin\\MultiMarkdown.pl | perl bin\\$SmartyPants $xslt | perl $g_utilsdir\\cleancites.pl $out");
 	} else {
-		$xslt = "| xsltproc -nonet -novalid XSLT/$xslt_file -" if ($xslt_file ne "");
-		open (MultiMarkdown, "| cd \"$MMDPath\"; bin/MultiMarkdown.pl | bin/$SmartyPants $xslt | Utilities/cleancites.pl $out");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir/$xslt_file -" if ($xslt_file ne "");
+		open (MultiMarkdown, "| cd \"$MMDPath\"; bin/MultiMarkdown.pl | bin/$SmartyPants $xslt | $g_utilsdir/cleancites.pl $out");
 	}
 	
 	print MultiMarkdown $text;
@@ -192,12 +203,12 @@ sub ProcessXHTML2MMD {
 	}
 	
 	if ($os =~ /MSWin/) {
-		$xslt = "| xsltproc -nonet -novalid XSLT\\$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir\\$xslt_file -" if ($xslt_file ne "");
 		$MMDPath =~ s/\//\\/g;
-		open (MultiMarkdown, "| cd \"$MMDPath\" & xsltproc -nonet -novalid XSLT\\$xslt_file - $out");
+		open (MultiMarkdown, "| cd \"$MMDPath\" & xsltproc -nonet -novalid $g_xsltdir\\$xslt_file - $out");
 	} else {
-		$xslt = "| xsltproc -nonet -novalid XSLT/$xslt_file -" if ($xslt_file ne "");
-		open (MultiMarkdown, "| cd \"$MMDPath\"; xsltproc -nonet -novalid XSLT/$xslt_file - $out");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir/$xslt_file -" if ($xslt_file ne "");
+		open (MultiMarkdown, "| cd \"$MMDPath\"; xsltproc -nonet -novalid $g_xsltdir/$xslt_file - $out");
 	}
 	
 	print MultiMarkdown $text;
