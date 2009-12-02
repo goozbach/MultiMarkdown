@@ -1,3 +1,7 @@
+THIS BRANCH
+    The purpose of this branch is to make MultiMarkdown easier to put
+    wherever you need it.  It is re-organized to be easily "stow able"
+
 NAME
     MultiMarkdown
 
