@@ -67,11 +67,25 @@
 		<xsl:copy>
 			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/header.html" -->]]></xsl:text>
 			<xsl:if test="/xhtml:html/xhtml:head/xhtml:title != ''">
-				<h1 class="page-title"><xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/></h1>
+				<h1 class="page-title"><a href=''><xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/></a></h1>
 			</xsl:if>
 			<xsl:if test="/xhtml:html/xhtml:head/xhtml:meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = 'date']/@content != ''">
-				<div class="date"><xsl:value-of select="/xhtml:html/xhtml:head/xhtml:meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = 'date']/@content"/>
-				</div>
+        <!-- date translation begin -->
+        <xsl:variable name="maindate">
+          <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = 'date']/@content" />
+        </xsl:variable>
+        <xsl:variable name="newdate">
+          <xsl:value-of select="substring-before($maindate,'T')"/>
+        </xsl:variable>
+        <xsl:variable name="tmptime">
+          <xsl:value-of select="substring-after($maindate,'T')"/>
+        </xsl:variable>
+        <xsl:variable name="newtime">
+          <xsl:value-of select="substring-before($tmptime,'-')"/>
+        </xsl:variable>
+        <!-- date translation end -->
+				<span class="byline vcard">By goozbach on <xsl:value-of select="$newdate"/> at <xsl:value-of select="$newtime"/>
+				</span>
 			</xsl:if>
 			<xsl:if test="/xhtml:html/xhtml:head/xhtml:meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = 'tags-disabled']/@content != ''">
 				<div class="tags">Tags: <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = 'tags']/@content"/>
@@ -82,5 +96,5 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	
+
 </xsl:stylesheet>

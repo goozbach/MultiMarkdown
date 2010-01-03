@@ -59,7 +59,7 @@ sub ProcessMMD2XHTML {
 	}
 	
 	if ($os =~ /MSWin/) {
-		$xslt = "| xsltproc -nonet -novalid $g_xsltdirXSLT\\$xslt_file -" if ($xslt_file ne "");
+		$xslt = "| xsltproc -nonet -novalid $g_xsltdir\\XSLT\\$xslt_file -" if ($xslt_file ne "");
 		$MMDPath =~ s/\//\\/g;
 		open (MultiMarkdown, "| cd $MMDPath & perl bin\\MultiMarkdown.pl | perl bin\\$SmartyPants $xslt $out");
 	} else {
