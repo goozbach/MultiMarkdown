@@ -59,13 +59,13 @@
 	<xsl:template match="xhtml:head">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>
-			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/head.html" -->]]></xsl:text>
+			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/head.inc" -->]]></xsl:text>
 		</xsl:copy>
 	</xsl:template>
 
 	<xsl:template match="xhtml:body">
 		<xsl:copy>
-			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/header.html" -->]]></xsl:text>
+			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/header.inc" -->]]></xsl:text>
 			<xsl:if test="/xhtml:html/xhtml:head/xhtml:title != ''">
 				<h1 class="page-title"><a href=''><xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/></a></h1>
 			</xsl:if>
@@ -92,7 +92,7 @@
 				</div>
 			</xsl:if>
 			<xsl:apply-templates select="@*|node()"/>
-			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/bottom.html" -->]]></xsl:text>
+			<xsl:text disable-output-escaping="yes"><![CDATA[<!--#include virtual="/templates/bottom.inc" -->]]></xsl:text>
 		</xsl:copy>
 	</xsl:template>
 	
