@@ -1,24 +1,17 @@
 #!/usr/bin/env perl
+##
+# Utility script to process OPML files back into MMD
 #
-# mmd2RTF.pl
-#
-# Utility script to process MultiMarkdown files into RTF
-#
-# Copyright (c) 2009 Fletcher T. Penney
+# Copyright (c) 2010 Fletcher T. Penney
 #	<http://fletcherpenney.net/>
 #
-# MultiMarkdown Version 2.0.b6
-#
 
-# Combine all the steps necessary to process MultiMarkdown text into an RTF
-# document.
-#
 # This script will process the text received via stdin, and output to stdout,
 # OR
 # will accept a list of files, and process each file individually.
 #
-# If a list of files is received, the input from "test.txt" will be output
-# to "test.rtf", for example.
+# If a list of files is received, the input from "test.opml" will be output
+# to "test.txt", for example.
 
 use strict;
 use warnings;
@@ -45,7 +38,7 @@ if ($count == 0) {
 	undef $/;
 	my $data .= <>;
 
-	MultiMarkdown::Support::ProcessMMD2RTF($MMDPath, "", $data);
+	MultiMarkdown::Support::ProcessOPML2MMD($MMDPath, "", $data);
 
 } else {
 	# We're in "file mode"
@@ -66,7 +59,7 @@ if ($count == 0) {
 			my $data = <INPUT>;
 			close(INPUT);
 
-			MultiMarkdown::Support::ProcessMMD2RTF($MMDPath, $filename, $data);
+			MultiMarkdown::Support::ProcessOPML2MMD($MMDPath, $filename, $data);
 		} else {
 			system("perldoc $0");
 		}
@@ -151,7 +144,7 @@ sub LoadModule {
 	my $os = $^O;	# Mac = darwin; Linux = linux; Windows contains MSWin
 
 	if ($os =~ /MSWin/) {
-		# Not sure what I can do here
+		# Not sure what I can do her
 	} else {
 		unless (my $return = eval `cat "$file"`) {
 			warn "couldn't parse $file: $@" if $@;
@@ -163,18 +156,19 @@ sub LoadModule {
 
 =head1 NAME
 
-mmd2XHTML - utility script for MultiMarkdown to convert MultiMarkdown text
-into XHTML.
+OPML2mmd - utility script for MultiMarkdown to convert OPML back into
+MultiMarkdown text.
 
 =head1 SYNOPSIS
 
-mmd2XHTML.pl [file ...]
+OPML2mmd.pl [file ...]
 
 
 =head1 DESCRIPTION
 
-This script is designed as a "front-end" for MultiMarkdown. It can convert a
-series of text files into RTF files.
+This  script is  designed as  a  "reversal" for  MultiMarkdown generated  OPML
+files. It can convert a series of text files from OPML back into MultiMarkdown
+text files.
 
 
 =head1 SEE ALSO
@@ -197,20 +191,20 @@ Fletcher T. Penney, E<lt>owner@fletcherpenney.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Fletcher T. Penney
+Copyright (C) 2010 by Fletcher T. Penney
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+This program is free software; you  can redistribute it and/or modify it under
+the terms of the GNU General Public  License as published by the Free Software
+Foundation; either  version 2 of  the License, or  (at your option)  any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+This program is  distributed in the hope  that it will be  useful, but WITHOUT
+ANY WARRANTY; without even the  implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the
+You should have received  a copy of the GNU General  Public License along with
+this program; if not, write to the
+
    Free Software Foundation, Inc.
    59 Temple Place, Suite 330
    Boston, MA 02111-1307 USA

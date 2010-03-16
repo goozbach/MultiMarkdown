@@ -53,20 +53,20 @@
 	</xsl:template>
 
 	<xsl:template name="latex-footer">
-		<xsl:text>\begin{frame}[allowframebreaks]
-\frametitle{Bibliography}
+%		<xsl:text>\begin{frame}[allowframebreaks]
+%\frametitle{Bibliography}
 
 %	Bibliography
-\bibliographystyle{\mybibliostyle}
-\bibliocommand
-\end{frame}
+%\bibliographystyle{\mybibliostyle}
+%\bibliocommand
+%\end{frame}
 
 \end{document}
 </xsl:text>
 	</xsl:template>
 
 	<xsl:template name="latex-document-class">
-		<xsl:text>\documentclass[ignorenonframetext,12pt]{beamer}
+		<xsl:text>\documentclass[ignorenonframetext,11pt]{beamer}
 %\documentclass[onesided]{article}
 %\usepackage{graphicx}
 %\usepackage{beamerarticle}
@@ -76,6 +76,7 @@
 \usepackage{tabulary}		% Support longer table cells
 \usepackage{booktabs}		% Support better tables
 
+\usepackage{subfigure}
 
 \let\oldSubtitle\subtitle
 
@@ -110,6 +111,14 @@
 	\usetheme{\theme}
 \fi
 
+
+\AtBeginSubsection[]
+{
+   \begin{frame}
+       \frametitle{Outline}
+       \tableofcontents[currentsection,currentsubsection]
+   \end{frame}
+}
 
 %\title{\mytitle}
 
@@ -156,34 +165,20 @@
 	<!-- Convert headers into chapters, etc -->
 
 	<xsl:template match="html:h1">
-		<!-- Only show a part if it contains a section -->
-		<xsl:if test="count(following-sibling::*[local-name() = 'h2'][1]/following-sibling::*) &gt; count(following-sibling::*[local-name() = 'h1'][1]/following-sibling::*)">		
-			<xsl:text>\part{</xsl:text>
-			<xsl:value-of select="substring(node(),1,(string-length(node()) - 1))"/>
-			<xsl:text>}</xsl:text>
-			<xsl:value-of select="$newline"/>
-			<xsl:text>\label{</xsl:text>
-			<xsl:value-of select="@id"/>
-			<xsl:text>}</xsl:text>
-			<xsl:value-of select="$newline"/>
-			<xsl:value-of select="$newline"/>
+		<xsl:text>\part{</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>}</xsl:text>
+		<xsl:value-of select="$newline"/>
+		<xsl:text>\label{</xsl:text>
+		<xsl:value-of select="@id"/>
+		<xsl:text>}</xsl:text>
+		<xsl:value-of select="$newline"/>
+		<xsl:value-of select="$newline"/>
+		<xsl:text>\frame{\partpage}
+</xsl:text>
+		<xsl:variable name="children" select="count(following-sibling::*) - count(following-sibling::*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3' or local-name() = 'h4' or local-name() = 'h5' or local-name() = 'h6'][1]/following-sibling::*) - count(following-sibling::*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3' or local-name() = 'h4' or local-name() = 'h5' or local-name() = 'h6'][1])"/>
 
-			<xsl:text>
-\frame{
-</xsl:text>
-			<xsl:if test="substring(node(), (string-length(node()) - string-length('*')) + 1) != '*'">
-				<xsl:text>\frametitle{</xsl:text>
-<xsl:apply-templates select="node()"/>
-<xsl:text>}
-</xsl:text>
-			</xsl:if>
-			<xsl:text>\tableofcontents
-}
-</xsl:text>
-			<xsl:variable name="children" select="count(following-sibling::*) - count(following-sibling::*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3' or local-name() = 'h4' or local-name() = 'h5' or local-name() = 'h6'][1]/following-sibling::*) - count(following-sibling::*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3' or local-name() = 'h4' or local-name() = 'h5' or local-name() = 'h6'][1])"/>
-
-			<xsl:apply-templates select="following-sibling::*[position() &lt;= $children]"/>
-		</xsl:if>
+		<xsl:apply-templates select="following-sibling::*[position() &lt;= $children]"/>
 	</xsl:template>
 	
 	<xsl:template match="html:h2">
@@ -355,9 +350,47 @@
 	</xsl:text>
 		</xsl:template>
 
+	<xsl:template match="html:img" mode="images">
+		<xsl:if test="@id">
+			<xsl:text>\label{</xsl:text>
+			<xsl:value-of select="@id"/>
+			<xsl:text>}
+</xsl:text>
+		</xsl:if>
+	<xsl:text>\subfigure</xsl:text>
+		<xsl:if test="@title">
+			<xsl:if test="not(@title = '')">
+				<xsl:text>[</xsl:text>
+				<xsl:apply-templates select="@title"/>
+				<xsl:text>]</xsl:text>
+			</xsl:if>
+		</xsl:if>
+		<xsl:text>{\includegraphics[keepaspectratio,width=\textwidth, height=.75\textheight]{</xsl:text>
+		<xsl:value-of select="@src"/>
+		<xsl:text>}}\quad
+</xsl:text>
+	</xsl:template>
+
+	<!-- paragraph with multiple images -->
+	<xsl:template match="html:p[count(child::html:img) > '1']">
+		<xsl:text>\begin{figure}
+\begin{center}
+</xsl:text>
+		
+		<xsl:apply-templates select="node()" mode="images"/>
+		<xsl:text>\end{center}
+\end{figure}
+</xsl:text>
+		<xsl:value-of select="$newline"/>
+		<xsl:value-of select="$newline"/>
+		<xsl:value-of select="$newline"/>
+	</xsl:template>
+
 	<xsl:template match="html:div[@class='bibliography']">
 		<!-- close the preceding frame first - we want to be our own slide(s) -->
 		<xsl:text>\end{frame}
+
+\part{Bibliography}
 \begin{frame}[allowframebreaks]
 \frametitle{Bibliography}
 \begin{thebibliography}{</xsl:text>

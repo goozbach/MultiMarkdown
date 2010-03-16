@@ -170,7 +170,7 @@ unless ($@) {
 		my $plugin = new MT::Plugin({
 			name => "MultiMarkdown",
 			description => "Based on the original Markdown",
-			doc_link => 'http://fletcherpenney.net/MultiMarkdown/'
+			doc_link => 'http://fletcherpenney.net/multimarkdown/'
 		});
 		MT->add_plugin( $plugin );
 	}
@@ -982,7 +982,7 @@ sub _DoHeaders {
 	#	  Header 2
 	#	  --------
 	#
-	$text =~ s{ ^(.+?)(?:\s\[([^\[]*?)\])?[ \t]*\n=+[ \t]*\n+ }{
+	$text =~ s{ ^(.+?)(?:\s*(?<!\\)\[([^\[]*?)\])?[ \t]*\n=+[ \t]*\n+ }{
 		if (defined $2) {
 			$label = Header2Label($2);
 		} else {
@@ -1003,7 +1003,7 @@ sub _DoHeaders {
 		"<h$h_level$idString>"  .  $header  .  "</h$h_level>\n\n";
 	}egmx;
 
-	$text =~ s{ ^(.+?)(?:\s*\[([^\[]*?)\])?[ \t]*\n-+[ \t]*\n+ }{
+	$text =~ s{ ^(.+?)(?:\s*(?<!\\)\[([^\[]*?)\])?[ \t]*\n-+[ \t]*\n+ }{
 		if (defined $2) {
 			$label = Header2Label($2);
 		} else {
@@ -1038,7 +1038,7 @@ sub _DoHeaders {
 			[ \t]*
 			(.+?)		# $2 = Header text
 			[ \t]*
-			(?:\[([^\[]*?)\])?	# $3 = optional label for cross-reference
+			(?:(?<!\\)\[([^\[]*?)\])?	# $3 = optional label for cross-reference
 			[ \t]*
 			\#*			# optional closing #'s (not counted)
 			\n+
@@ -1795,7 +1795,7 @@ sub _DoFootnotes {
 	$text =~ s{
 		\[\^(.+?)\]		# id = $1
 	}{
-		my $result;
+		my $result = "";
 		my $id = id2footnote($1);
 		if (defined $g_footnotes{$id} ) {
 			$g_footnote_counter++;
@@ -2015,19 +2015,21 @@ sub _DoTables {
 		
 		# Add Caption, if present
 		
-		if ($table =~ s/^$line_start\[\s*(.*?)\s*\](\[\s*(.*?)\s*\])?[ \t]*$//m) {
+		if ($table =~ s/^$line_start(?:\[\s*(.*)\s*\])?(?:\[\s*(.*?)\s*\])[ \t]*$//m) {
 			my $table_id = "";
-			if (defined $3) {
-				# add caption id to cross-ref list
-				$table_id = Header2Label($3);
+			my $table_caption = "";
+
+			$table_id = Header2Label($2);
+
+			if (defined $1) {
+				$table_caption = $1;
 			} else {
-				# use caption as the id
-				$table_id = Header2Label($1);
+				$table_caption = $2;
 			}
-			$result .= "<caption id=\"$table_id\">" . _RunSpanGamut($1). "</caption>\n";
+			$result .= "<caption id=\"$table_id\">" . _RunSpanGamut($table_caption). "</caption>\n";
 				
 			$g_crossrefs{$table_id} = "#$table_id";
-			$g_titles{$table_id} = "$1";
+			$g_titles{$table_id} = "see table";		# captions with "stuff" in them break links
 		}
 				
 		# If a second "caption" is present, treat it as a summary
