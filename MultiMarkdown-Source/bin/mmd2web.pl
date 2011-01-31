@@ -1,24 +1,27 @@
 #!/usr/bin/env perl
 #
-# mmd2RTF.pl
 #
-# Utility script to process MultiMarkdown files into RTF
+# Utility script to process MultiMarkdown files into XHTML for web sites
 #
-# Copyright (c) 2009 Fletcher T. Penney
+# Copyright (c) 2009-2010 Fletcher T. Penney
 #	<http://fletcherpenney.net/>
 #
 # MultiMarkdown Version 2.0.b6
 #
 
-# Combine all the steps necessary to process MultiMarkdown text into an RTF
-# document.
+# Combine all the steps necessary to process MultiMarkdown text into XHTML
+# Not necessary, but easier than stringing the commands together manually.
 #
 # This script will process the text received via stdin, and output to stdout,
 # OR
 # will accept a list of files, and process each file individually.
 #
 # If a list of files is received, the input from "test.txt" will be output
-# to "test.rtf", for example.
+# to "test.html", for example.
+
+# Specifically, this script forces MMD to use `xhtml-static-site.xslt`
+# when processing.  This XSLT is designed to format a web page for my 
+# MultiMarkdown CMS.
 
 use strict;
 use warnings;
@@ -43,9 +46,10 @@ if ($count == 0) {
 
 	# process stdin
 	undef $/;
-	my $data .= <>;
+	my $data = "xhtml xslt: xhtml-static-site\n";
+	$data .= <>;
 
-	MultiMarkdown::Support::ProcessMMD2RTF($MMDPath, "", $data);
+	MultiMarkdown::Support::ProcessMMD2XHTML($MMDPath, "", $data);
 
 } else {
 	# We're in "file mode"
@@ -63,10 +67,11 @@ if ($count == 0) {
 			# Read input and process
 			open(INPUT, "<$filename");
 			local $/;
-			my $data = <INPUT>;
+			my $data = "xhtml xslt: xhtml-static-site\n";
+			$data .= <INPUT>;
 			close(INPUT);
 
-			MultiMarkdown::Support::ProcessMMD2RTF($MMDPath, $filename, $data);
+			MultiMarkdown::Support::ProcessMMD2XHTML($MMDPath, $filename, $data);
 		} else {
 			system("perldoc $0");
 		}
@@ -174,7 +179,7 @@ mmd2XHTML.pl [file ...]
 =head1 DESCRIPTION
 
 This script is designed as a "front-end" for MultiMarkdown. It can convert a
-series of text files into RTF files.
+series of text files into XHTML.
 
 
 =head1 SEE ALSO
